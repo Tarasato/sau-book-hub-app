@@ -1,28 +1,32 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-interface PageProps {
+interface CategoryChatProps {
   params: {
     id: string;
     catename: string;
-  };
+  } | Promise<{ id: string; catename: string }>; // support future version
 }
 
-export default function CategoryChat({ params }: PageProps) {
-  const { id, catename } = params;
+export default function CategoryChat({ params }: CategoryChatProps) {
+  // React.use() unwrap params
+  const resolvedParams = React.use(params);
+  const { id, catename } = resolvedParams;
   
-  const decodedCatename = decodeURIComponent(catename);
+  const decodedCatename = React.useMemo(() => decodeURIComponent(catename), [catename]);
 
   const router = useRouter();
-
-  const [messages, setMessages] = useState([
-    { id: 1, user: 'นาย ก', content: 'ใครเคยอ่านเรื่องนี้บ้าง?' },
-    { id: 2, user: 'นาง ข', content: 'สนุกมาก! แนะนำให้ลองอ่าน.' },
-  ]);
-
+  const [messages, setMessages] = useState<{ id: number; user: string; content: string }[]>([]);
   const [newMessage, setNewMessage] = useState('');
+
+  useEffect(() => {
+    setMessages([
+      { id: 1, user: 'นาย ก', content: 'ใครเคยอ่านเรื่องนี้บ้าง?' },
+      { id: 2, user: 'นาง ข', content: 'สนุกมาก! แนะนำให้ลองอ่าน.' },
+    ]);
+  }, []);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +47,9 @@ export default function CategoryChat({ params }: PageProps) {
         กลับ
       </button>
 
-      <h1 className="text-3xl font-bold mb-6">ห้องแชทหมวด: {decodedCatename}</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        ห้องแชทหมวด: {decodedCatename}
+      </h1>
 
       <div className="border p-4 rounded h-[400px] overflow-y-auto mb-4 space-y-2">
         {messages.map((msg) => (
