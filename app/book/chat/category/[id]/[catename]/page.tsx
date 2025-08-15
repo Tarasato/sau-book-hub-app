@@ -11,8 +11,7 @@ interface PageProps {
 }
 
 export default function CategoryChat({ params }: PageProps) {
-  const resolvedParams = React.use(params);
-  const { id, catename } = resolvedParams;
+  const { id, catename } = params;
   
   const decodedCatename = decodeURIComponent(catename);
 
