@@ -3,20 +3,14 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-interface CategoryChatProps {
-  params: {
-    id: string;
-    catename: string;
-  } | Promise<{ id: string; catename: string }>; // support future version
+interface PageProps {
+  params: { id: string; catename: string };
 }
 
-export default function CategoryChat({ params }: CategoryChatProps) {
-  // React.use() unwrap params
-  const resolvedParams = React.use(params);
-  const { id, catename } = resolvedParams;
+export default function CategoryChat({ params }: PageProps) {
+  const { id, catename } = params;
+  const decodedCatename = decodeURIComponent(catename);
   
-  const decodedCatename = React.useMemo(() => decodeURIComponent(catename), [catename]);
-
   const router = useRouter();
   const [messages, setMessages] = useState<{ id: number; user: string; content: string }[]>([]);
   const [newMessage, setNewMessage] = useState('');
